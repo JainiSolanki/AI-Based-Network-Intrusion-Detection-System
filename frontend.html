@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIDS Prediction</title>
+    <script>
+        async function predictIntrusion() {
+            const features = [];
+            
+            // Get feature values from input fields
+            for (let i = 0; i < 20; i++) {
+                features.push(parseFloat(document.getElementById(`feature_${i}`).value) || 0);
+            }
+
+            console.log("Sending data:", JSON.stringify({ features })); // Debugging
+
+            try {
+                // Send request to Flask API
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ features })
+                });
+
+                const result = await response.json();
+                console.log("Response received:", result); // Debugging
+                
+                document.getElementById("prediction").innerText = 
+                    result.prediction === 1 ? "🚨 Intrusion Detected! 🚨" : "✅ Normal Traffic ✅";
+
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("prediction").innerText = "❌ Error in Prediction!";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>AI-Based Network Intrusion Detection System</h2>
+    
+    <div>
+        <h3>Enter Feature Values:</h3>
+        <form onsubmit="event.preventDefault(); predictIntrusion();">
+            <div id="feature_inputs"></div>
+            <br>
+            <button type="submit">Predict</button>
+        </form>
+    </div>
+
+    <h3>Prediction Result:</h3>
+    <p id="prediction">Awaiting Input...</p>
+
+    <script>
+        // Generate input fields dynamically
+        const featureContainer = document.getElementById("feature_inputs");
+        for (let i = 0; i < 20; i++) {
+            featureContainer.innerHTML += `Feature ${i}: <input type="number" id="feature_${i}" step="0.01"><br>`;
+        }
+    </script>
+</body>
+</html>

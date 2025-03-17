@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Intrusion Detection System</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --border-radius: 8px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        header {
+            background-color: var(--dark);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        header .logo {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .card {
+            padding: 25px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background-color: var(--light);
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .prediction-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .prediction-result {
+            font-size: 24px;
+            font-weight: 600;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            display: inline-block;
+            min-width: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .normal {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            border: 1px solid #2ecc71;
+        }
+        
+        .intrusion {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+            border: 1px solid #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .waiting {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .error {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: #d35400;
+            border: 1px solid #f39c12;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        .feature-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-left: 10px;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(52, 152, 219, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .prediction-result {
+                min-width: 0;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🛡️</div>
+            <div>
+                <h1>Network Intrusion Detection System</h1>
+                <p>AI-powered analysis for network traffic anomalies</p>
+            </div>
+        </header>
+        
+        <div class="feature-tabs">
+            <div class="tab active" onclick="openTab('inputTab', this)">Traffic Analysis</div>
+            <div class="tab" onclick="openTab('aboutTab', this)">About NIDS</div>
+        </div>
+        
+        <div id="inputTab" class="tab-content active">
+            <div class="card">
+                <h2>Network Traffic Features</h2>
+                <p>Enter the network traffic feature values to analyze for potential intrusions:</p>
+                
+                <form id="predictionForm" onsubmit="event.preventDefault(); predictIntrusion();">
+                    <div class="feature-grid" id="feature_inputs">
+                        <!-- Feature inputs will be dynamically generated here -->
+                    </div>
+                    
+                    <div class="actions">
+                        <button type="submit">
+                            <span class="icon">🔍</span> Analyze Traffic
+                        </button>
+                        
+                        <button type="button" onclick="resetForm()" style="background-color: #7f8c8d;">
+                            <span class="icon">↺</span> Reset
+                        </button>
+                        
+                        <button type="button" onclick="generateSampleData('normal')" style="background-color: var(--success);">
+                            <span class="icon">⚙️</span> Load Normal Sample
+                        </button>
+                        
+                        <button type="button" onclick="generateSampleData('intrusion')" style="background-color: var(--danger);">
+                            <span class="icon">⚠️</span> Load Intrusion Sample
+                        </button>
+                        
+                        <div class="loading" id="loadingIndicator">
+                            <div class="spinner"></div>
+                            <span>Analyzing...</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card prediction-container">
+                <h2>Analysis Result</h2>
+                <div class="prediction-result waiting" id="prediction">Awaiting Input...</div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: rgba(46, 204, 113, 0.6);"></div>
+                        <span>Normal Traffic</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: rgba(231, 76, 60, 0.6);"></div>
+                        <span>Potential Intrusion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="aboutTab" class="tab-content">
+            <div class="card">
+                <h2>About Network Intrusion Detection</h2>
+                <p>This application uses machine learning algorithms to detect potential network intrusions by analyzing various network traffic features. The system is powered by:</p>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li>Snort: An open-source network intrusion detection system</li>
+                    <li>Python: For machine learning model development and API backend</li>
+                    <li>Advanced AI algorithms: To identify abnormal patterns in traffic</li>
+                </ul>
+                
+                <h3 style="margin-top: 20px;">How It Works</h3>
+                <p>The system analyzes 20 different network traffic features to determine if the traffic pattern matches known intrusion signatures or displays anomalous behavior that could indicate a security threat.</p>
+                
+                <h3 style="margin-top: 20px;">Feature Descriptions</h3>
+                <p>The 20 features analyzed by this system include metrics such as packet size, flow duration, protocol types, and other network characteristics that help identify malicious network activities.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        © 2025 Network Intrusion Detection System | AI-Powered Security Analysis
+    </footer>
+
+    <script>
+        // Generate input fields dynamically with better labels
+        const featureLabels = [
+            "Duration", "Protocol Type", "Service", "Flag", "Source Bytes", 
+            "Destination Bytes", "Land", "Wrong Fragment", "Urgent", "Hot",
+            "Failed Logins", "Logged In", "# Compromised", "Root Shell", "Su Attempted",
+            "# Root", "# File Creations", "# Shells", "# Access Files", "# Outbound Commands"
+        ];
+        
+        const featureContainer = document.getElementById("feature_inputs");
+        for (let i = 0; i < 20; i++) {
+            const inputGroup = document.createElement("div");
+            inputGroup.className = "input-group";
+            
+            const label = document.createElement("label");
+            label.htmlFor = `feature_${i}`;
+            label.textContent = featureLabels[i] || `Feature ${i}`;
+            
+            const input = document.createElement("input");
+            input.type = "number";
+            input.id = `feature_${i}`;
+            input.step = "0.01";
+            input.placeholder = "Enter value";
+            
+            inputGroup.appendChild(label);
+            inputGroup.appendChild(input);
+            featureContainer.appendChild(inputGroup);
+        }
+        
+        // Function to predict intrusion with improved UI feedback
+        async function predictIntrusion() {
+            const features = [];
+            const loadingIndicator = document.getElementById("loadingIndicator");
+            const prediction = document.getElementById("prediction");
+            
+            // Show loading state
+            loadingIndicator.style.display = "flex";
+            prediction.className = "prediction-result waiting";
+            prediction.innerText = "Analyzing Traffic...";
+            
+            // Get feature values from input fields
+            for (let i = 0; i < 20; i++) {
+                features.push(parseFloat(document.getElementById(`feature_${i}`).value) || 0);
+            }
+
+            try {
+                // Send request to Flask API
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ features })
+                });
+
+                const result = await response.json();
+                
+                // Update prediction display with appropriate styling
+                if (result.prediction === 1) {
+                    prediction.className = "prediction-result intrusion";
+                    prediction.innerHTML = "🚨 INTRUSION DETECTED 🚨<br><small>Potential security threat identified</small>";
+                } else {
+                    prediction.className = "prediction-result normal";
+                    prediction.innerHTML = "✅ NORMAL TRAFFIC ✅<br><small>No threats detected</small>";
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                prediction.className = "prediction-result error";
+                prediction.innerHTML = "❌ ERROR IN PREDICTION ❌<br><small>Please check server connection</small>";
+            } finally {
+                // Hide loading indicator
+                loadingIndicator.style.display = "none";
+            }
+        }
+        
+        // Function to reset the form
+        function resetForm() {
+            document.getElementById("predictionForm").reset();
+            const prediction = document.getElementById("prediction");
+            prediction.className = "prediction-result waiting";
+            prediction.innerText = "Awaiting Input...";
+        }
+        
+        // Tab functionality
+        function openTab(tabId, tabElement) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Deactivate all tabs
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add("active");
+            
+            // Activate the clicked tab
+            if (tabElement) {
+                tabElement.classList.add("active");
+            }
+        }
+        
+        // Sample data generator for demonstration - FIXED VALUES
+        function generateSampleData(type) {
+            // Updated sample data based on your working example
+            const sampleData = {
+                // These values should represent normal traffic based on your model's expectations
+                normal: [1.23, -0.56, 0.78, -1.45, 0.92, -0.67, 1.12, -0.34, 0.58, -0.89, 0.45, -1.23, 0.76, 1.34, -0.21, 0.98, -1.01, 0.67, 0.45, -0.56],
+                // These values should trigger an intrusion detection
+                intrusion: [0, 3, 1, 0, 4578, 9254, 0, 0, 1, 1, 5, 0, 1, 1, 0, 1, 0, 1, 0, 0]
+            };
+            
+            // Fill form with sample data
+            const features = sampleData[type] || sampleData.normal;
+            for (let i = 0; i < features.length; i++) {
+                document.getElementById(`feature_${i}`).value = features[i];
+            }
+            
+            // Optional: Automatically analyze after loading sample data
+            // predictIntrusion();
+        }
+        
+        // Add keyboard shortcuts for form submission
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && event.ctrlKey) {
+                event.preventDefault();
+                predictIntrusion();
+            }
+        });
+        
+        // Add tooltips for feature explanations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add tooltips for feature explanations
+            const featureDescriptions = [
+                "Connection duration in seconds",
+                "Type of protocol (TCP, UDP, ICMP)",
+                "Network service on destination",
+                "Connection status",
+                "Bytes sent from source to destination",
+                "Bytes sent from destination to source",
+                "1 if connection is to same host/port, 0 otherwise",
+                "Number of wrong fragments",
+                "Number of urgent packets",
+                "Number of hot indicators",
+                "Number of failed login attempts",
+                "1 if successfully logged in, 0 otherwise",
+                "Number of compromised conditions",
+                "1 if root shell is obtained, 0 otherwise",
+                "1 if su root command attempted, 0 otherwise",
+                "Number of root accesses",
+                "Number of file creation operations",
+                "Number of shell prompts",
+                "Number of operations on access control files",
+                "Number of outbound commands in ftp session"
+            ];
+            
+            document.querySelectorAll('.input-group label').forEach((label, index) => {
+                if (featureDescriptions[index]) {
+                    label.title = featureDescriptions[index];
+                    label.style.cursor = "help";
+                    label.style.borderBottom = "1px dotted #999";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
